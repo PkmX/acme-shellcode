@@ -13,7 +13,7 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Acme.Shellcode
-  build-depends:       base == 4.7.*, template-haskell == 2.9.*, parsec == 3.1.*
+  build-depends:       base == 4.7.*, template-haskell == 2.9.*, bytestring == 0.10.*, parsec == 3.1.*
   hs-source-dirs:      src
   default-language:    Haskell2010
   C-sources:           src/shellcode.c
