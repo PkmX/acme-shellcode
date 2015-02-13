@@ -1,0 +1,20 @@
+name:                acme-shellcode
+version:             0.0.0.0
+synopsis:            Embed shellcode in your Haskell code with Template Haskell!
+-- description:
+license:             BSD3
+license-file:        LICENSE
+author:              PkmX
+maintainer:          pkmx.tw@gmail.com
+copyright:           2015, PkmX
+category:            Acme
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     Acme.Shellcode
+  build-depends:       base == 4.7.*, template-haskell == 2.9.*, parsec == 3.1.*
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+  C-sources:           src/shellcode.c
+  Includes:            src/shellcode.h
