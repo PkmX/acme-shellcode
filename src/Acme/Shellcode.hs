@@ -1,6 +1,6 @@
 {-# LANGUAGE ForeignFunctionInterface, MonadComprehensions, QuasiQuotes, TemplateHaskell #-}
 
-module Acme.Shellcode (shell, shellQQ) where
+module Acme.Shellcode (exec, shell) where
 
 import Control.Applicative
 import Data.ByteString.Char8
@@ -16,15 +16,15 @@ import Text.Parsec.Token
 
 foreign import ccall "shellcode.h shellcode" c_shellcode :: Ptr () -> CSize -> IO ()
 
-parser :: Parser ByteString
-parser = pack <$> many [ chr $ fromIntegral n | n <- integer haskell, 0 <= n && n <= 255 ] <* eof
+parser :: Parser String
+parser = many [ chr $ fromIntegral n | n <- integer haskell, 0 <= n && n <= 255 ] <* eof
 
-shell :: ByteString -> Q Exp
-shell s = [e|useAsCStringLen $(stringE $ unpack s) $ \(buf, len) -> c_shellcode (castPtr buf) (fromIntegral len)|]
+exec :: ByteString -> IO ()
+exec = flip useAsCStringLen $ \(buf, len) -> c_shellcode (castPtr buf) (fromIntegral len)
 
-shellQQ :: QuasiQuoter
-shellQQ = QuasiQuoter { quoteExp = either (fail . show) shell . parse parser ""
-                      , quotePat = undefined
-                      , quoteType = undefined
-                      , quoteDec = undefined
-                      }
+shell :: QuasiQuoter
+shell = QuasiQuoter { quoteExp = either (fail . show) (\s -> [e|exec $ $(stringE s)|]) . parse parser ""
+                    , quotePat = undefined
+                    , quoteType = undefined
+                    , quoteDec = undefined
+                    }
